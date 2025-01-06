@@ -82,7 +82,7 @@ def get_weightings(weight_schedule, snrs, t, sigma_data=0.5):
     return weightings
 
 
-def get_rectified_flow_loss_fn(reduce_mean=True, loss_type='l2'):
+def get_rectified_flow_loss_fn(reduce_mean=True, loss_type='l1'):
     """Create a loss function for training with rectified flow.
     Args:
         reduce_mean: If `True`, average the loss across data dimensions. Otherwise sum the loss across data dimensions.
@@ -127,6 +127,9 @@ def get_rectified_flow_loss_fn(reduce_mean=True, loss_type='l2'):
             losses = lpips_losses + l1_losses
         else:
             assert False, 'Not implemented'
+
+
+
         losses = reduce_op(losses.reshape(losses.shape[0], -1), dim=-1)
         losses *= weights
         loss = torch.mean(losses)

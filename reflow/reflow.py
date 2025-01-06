@@ -6,6 +6,8 @@ import logging
 from models.ema import ExponentialMovingAverage
 from reflow.losses import get_rectified_flow_loss_fn
 
+from einops import rearrange,repeat
+
 class RectifiedFlow():
     def __init__(self, model=None, ema_model=None, cfg=None):
         self.cfg = cfg
@@ -228,7 +230,7 @@ class RectifiedFlow():
         loss = self.loss_fn_teach(self, predicted, predicted_teacher.detach(), noise=noise, t=t_)
         return loss
 
-    def train_step(self, batch, current_training_step: int, augment_pipe=None, **kwargs: Any,):
+    def train_step(self, batch, current_training_step: int, augment_pipe=None, patch_size = 32,**kwargs: Any,):
         """Performs a training step"""
         ### get loss
         '''
@@ -241,10 +243,27 @@ class RectifiedFlow():
         # kwargs['augment_labels'] = augment_labels
         ## get data pair (self.data, self.noise)
         self.get_data_pair(batch)
+
+        ## Modified: pad the data and noise in order to patch them
+        halfp = patch_size // 2
+        batch_size, channels, H, W = batch.shape
+        self.data = torch.nn.functional.pad(self.data,(halfp, halfp, halfp, halfp), 'constant')
+        self.noise = torch.nn.functional.pad(self.noise,(halfp, halfp, halfp, halfp), 'constant')
+        self.data = rearrange(self.data, 'b c (p1 h) (p2 w) -> (b p1 p2) c h w', h = patch_size, w = patch_size)
+        self.noise = rearrange(self.noise, 'b c (p1 h) (p2 w) -> (b p1 p2) c h w', h = patch_size, w = patch_size)
+
         ## get interpolation t, x_t
         self.get_interpolations(self.data, self.noise)
         ## get prediction and target
         predicted, target = self.pred_batch_outputs(**kwargs)
+
+        ## Modified: rearrange predicted and target image to calculate loss
+        predicted = rearrange(predicted, '(b p1 p2) c h w -> b c (p1 h) (p2 w)', p1 = 2, p2 = 2)
+        predicted = predicted[:, :, halfp:-halfp, halfp:-halfp]
+        target = rearrange(target, '(b p1 p2) c h w -> b c (p1 h) (p2 w)', p1 = 2, p2 = 2)
+        target = target[:, :, halfp:-halfp, halfp:-halfp]
+
+
         ## calculate loss
         loss = self.loss_fn(self, predicted, target)
         if self.cfg.flow.use_teacher:

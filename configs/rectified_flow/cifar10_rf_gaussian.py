@@ -29,7 +29,8 @@ def get_config():
     training = config.training
     training.snapshot_freq = 20000
     training.reduce_mean = True
-    training.loss_type = 'l2' # NOTE: l1, l2, lpips, lpips+l1, lpips+l2
+    training.loss_type = 'l1' # NOTE: l1, l2, lpips, lpips+l1, lpips+l2
+    # training.loss_type = 'l2' # NOTE: l1, l2, lpips, lpips+l1, lpips+l2
     training.x0_randomness = 'fix_0' # NOTE: whether to use random x0: unpaired data
     training.resume_from = '' # NOTE: path to the checkpoint
     training.accumulation_steps = 1 # NOTE: gradient accumulation

@@ -166,7 +166,7 @@ def main(argv):
                 batch, label_dic = next(data_iterator)
             label = label_dic.to(device) if config.data.num_classes > 0 else None
             # perform a train step
-            loss = flow.train_step(batch.to(device), global_step, augment_pipe, label=label)
+            loss = flow.train_step(batch.to(device), global_step, augment_pipe, label=label, patch_size=32)
             loss /= config.training.accumulation_steps
             loss.backward()
             batch_loss += loss

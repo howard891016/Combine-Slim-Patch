@@ -16,8 +16,9 @@ ml_collections==0.1.1
 jax==0.4.6
 jaxlib==0.4.6
 urllib3==1.26.14
-calculate_flops
+# calculate_flops
 --extra-index-url https://download.pytorch.org/whl/cu117
 torch==1.13.1+cu117
 torchaudio==0.13.1+cu117
 torchvision==0.14.1+cu117
+einops
