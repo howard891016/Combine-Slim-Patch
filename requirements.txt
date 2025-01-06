@@ -18,10 +18,11 @@ jaxlib==0.4.6
 urllib3==1.26.14
 # calculate_flops
 # --extra-index-url https://download.pytorch.org/whl/cu117
---upgrade calflops
-# torch==1.13.1+cu117
-# torchaudio==0.13.1+cu117
-# torchvision==0.14.1+cu117
+--extra-index-url https://download.pytorch.org/whl/cu124
+# --upgrade calflops
+# torch==1.13.1
+# torchaudio==0.13.1
+# torchvision==0.14.1
 torch
 torchaudio
 torchvision
