@@ -23,7 +23,7 @@ from reflow import sampling as sampling
 from reflow.augment import AugmentPipe
 from datetime import datetime
 
-
+os.environ['TORCH_CUDA_ARCH_LIST'] = '8.9'
 FLAGS = flags.FLAGS
 config_flags.DEFINE_config_file(
   "config", None, "Training configuration.", lock_config=True)
